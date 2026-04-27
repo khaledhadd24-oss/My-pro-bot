@@ -1,0 +1,36 @@
+import telebot
+from telebot import types
+import sqlite3
+import random
+
+# --- إعدادات البوت الخاصة بك ---
+TOKEN = '8739370949:AAFHiBA_wI-S_kGJftPcaut8g5gLbOKbJks'
+ADMIN_ID = 6440799257 
+
+bot = telebot.TeleBot(TOKEN)
+
+# --- تجهيز قاعدة بيانات المستخدمين ---
+def init_db():
+    conn = sqlite3.connect('pro_database.db')
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS users 
+                 (user_id INTEGER PRIMARY KEY, balance REAL DEFAULT 0.0)''')
+    conn.commit()
+    conn.close()
+
+init_db()
+
+# --- قائمة الأزرار الرئيسية ---
+def main_menu():
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.add("📊 تحليل المباريات", "💰 رصيدي")
+    markup.add("📥 إيداع USDT", "📤 طلب سحب")
+    markup.add("🎁 دخول السحب")
+    return markup
+
+@bot.message_handler(commands=['start'])
+def start(message):
+    user_id = message.from_user.id
+    conn = sqlite3.connect('pro_database.db')
+    c = conn.cursor()
+    c.execute("INSERT OR IGNORE INTO users
